@@ -78,9 +78,13 @@ fewshot_prompt = FewShotChatMessagePromptTemplate(
 last_prompt = ChatPromptTemplate.from_messages([
     ('system','당신은 직장인들의 식사 메뉴 고민을 해결해 주는 계획적인 "식사 해결사" 입니다. 상황에 맞게 계획적으로 메뉴를 추천해 주세요.'), # 페르소나
     fewshot_prompt, # 샘플
-    ('human') # 실제 사용자의 질의 세팅
+    ('human',"{user_cur_input}") # 실제 사용자의 질의 세팅
+    # {user_cur_input:질의} 형태로 llm 호출시 전달!!
 ])
 
+# 4-4. 체인 구성 (파이프라인 구성 -> 연속된 FLOW 구성)
+chain = last_prompt | llm
+# 해당 파이프라인에서 사용자의 질의 주입하면 연속적으로 작동됨
 
 # 5. pydantic => 요청 혹은 응답의 구조를 정의한 클레스 설계
 #    요청 데이터를 => 특정 클레스로 바로 받아서 객체 생성
@@ -92,5 +96,8 @@ class UserRequest(BaseModel): # 4-1. BaseModel 클레스를 반드시 상속
 # 6. API 엔드포인트 구성
 @app.post('/chat')
 def llm_endpoint( req:UserRequest):# req => 매개변수 :UserRequest => 타입힌트
-    return {"response":f"에코 응답:{ req.question }"}
+    #return {"response":f"에코 응답:{ req.question }"}
     # 5-1. `LLM 호출`하여 유저의 질의(프럼프트)를 전달 -> 결과를 받아서 -> 응답
+    #      langchain 호출
+    response = chain.invoke({"user_cur_input":req.question})
+    return {"response":response.content}
