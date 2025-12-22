@@ -96,5 +96,13 @@ L server.py         : 백엔드 담당, fastapi 주로 사용
             - 함수 내부에서 bedrock 호출 -> llm 호출 -> 응답 -> {'response':응답값}
 
         - 나머지는 랭체인 퓨샷등 프럼프트 구성 사용 (코랩 사용 코드 활용)
-        - model은 claude 사용 (다른 모델도 가능)
+        - model은 gemma(google) 사용 (다른 모델도 가능)
     ```
+
+# advanced (발전적 확장)
+    - rag(검색 증강) : LLM 한번도 접하지 못함 사내 데이터(내부 데이터) 활용
+    - vectordb      : 대화 내욕 기록(장기기억 담당), rag등 데이터를 저장하는 공간 활용, 유사도 체크 기능 활용
+    - mcp           : 외부 자원(db, rag, 검색, ... <- tool들 중계 호출 관리)
+    - 위의 flow( 질의 => LLM 대응하도록 구성하는 )를 graph로 설계
+    - 이것을 agent단위로 개발
+    - 질의당 1개 agent 대응 or 질의당 여러개의 agent 대응(AtoA)  -> Agent enginnering
