@@ -24,8 +24,10 @@ file_paths = glob.glob('./test/data/*.txt')
 #print( file_paths )
 
 # 3. TextLoader를 이용하여 문서 로드
-raw_docs = [ TextLoader( file, encoding='utf-8').load() for file in file_paths ] 
-print( "파일로드 완료", len(raw_docs), raw_docs[0] )
+#raw_docs = [ TextLoader( file, encoding='utf-8').load() for file in file_paths ] 
+# # 위의 코드 : [[Document, ], ...]
+raw_docs = [ TextLoader( file, encoding='utf-8').load()[0] for file in file_paths ] 
+# # 아래 코드 : [Document, ...]
 
 # 4. 텍스트 분할 (특정 크기의 청크 단위로 데이터를 분할하여 준비)
 #    성능을 위해 적절한 크기 설정 필요
@@ -34,4 +36,18 @@ splitter = RecursiveCharacterTextSplitter(
     chunk_overlap = 100  # 문맥 유지를 위해 겹치는 구간
 )
 splites = splitter.split_documents( raw_docs )
-# print( "총 청크수 ", len(splites), splites[0] )
+#print( "총 청크수 ", len(splites), splites[0] )
+
+# 5. 임베딩 모델
+tokenizer = BedrockEmbeddings( model_id    = "amazon.titan-embed-text-v1", 
+                               region_name = os.getenv('AWS_REGION') )
+
+# 6. 백터디비생성
+db = FAISS.from_documents( splites, tokenizer ) # 디비 생성 완료, 데이터 삽입 완료
+
+# 7. 검색 테스트
+query = "해리포터의 친구" # 추론의 질의임 (결과값이 않좋을 수 있음)
+docs  = db.similarity_search(query)
+
+# 8. 답출력(유사도중 가장 높은 점수를 받은 문장)
+print( query, docs[0].page_content)
