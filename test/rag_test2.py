@@ -45,9 +45,12 @@ tokenizer = BedrockEmbeddings( model_id    = "amazon.titan-embed-text-v1",
 # 6. 백터디비생성
 db = FAISS.from_documents( splites, tokenizer ) # 디비 생성 완료, 데이터 삽입 완료
 
-# 7. 검색 테스트
+# 7. 백터 디비화 된 데이터를 저장 -> 매번 로드되는 현상 해결(프로젝트때는 사전입력)
+db.save_local('hp_story')
+
+# 8. 검색 테스트
 query = "해리포터의 친구" # 추론의 질의임 (결과값이 않좋을 수 있음)
 docs  = db.similarity_search(query)
 
-# 8. 답출력(유사도중 가장 높은 점수를 받은 문장)
+# 9. 답출력(유사도중 가장 높은 점수를 받은 문장)
 print( query, docs[0].page_content)
