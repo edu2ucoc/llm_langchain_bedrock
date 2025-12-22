@@ -5,7 +5,7 @@ import requests as req
 #print('사용자 입력후 엔티치면 계속 전체가 구동되는지 점검-')#, a)
 
 # 전역설정
-API_URL = 'http://localhost:8000/llm' # fastapi 주소
+API_URL = 'http://localhost:8000/chat' # fastapi 주소
 st.set_page_config(page_title='식사 메뉴 해결사')#, page_icon='')
 st.title('AI 식사 메뉴 해결사 - 킹')
 st.caption('예상, 점심/저녁등 시점, 날씨, 기분, 단체여부등 알려주시면 메뉴를 추천해 드립니다.')
