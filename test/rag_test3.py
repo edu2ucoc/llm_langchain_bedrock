@@ -33,10 +33,47 @@ bedrock_client = boto3.client(
 # 2. llm 생성
 llm = ChatBedrock(
     client   = bedrock_client,
-    model_id = 'anthropic.claude-3-5-sonnet-20240620-v1:0', # os.getenv('BEDROCK_MODEL_ID'), 구글은 ChatBedrock 미지원
+    model_id = 'openai.gpt-oss-120b-1:0', # os.getenv('BEDROCK_MODEL_ID'), 구글은 ChatBedrock 미지원
     model_kwargs = {
         "temperature": 0.7,
         "max_tokens" : 500
     }
 )
 # 3. prompt 구성
+prompt = ChatPromptTemplate.from_template('''
+다음의 제공된 context(문맥, 참고)을 사용하여 질문에 답변해 주세요.
+만약, 문맥에서 답을 찾을 수 없다면, "잘 모르겠다"고 대답 하세요.
+                                          
+<context>
+{context}
+</context>
+                                          
+질문: {user_input}
+''')
+
+# 4. 체인 구성 : 초기스타일 <-> 최근 스타일:파이프 연산자(|) 사용하여 LCEL(Langchain Expression Language)
+# 4-1. 리트리버 생성      : DB에서 유사도 높은 문서를 찾아온다 -> top 3 제한
+retriever = db.as_retriever(search_kwargs={"k":3}) # 상위 3개 문서 참조
+# 4-2. 문서 결합 체인     : 검색된 문서들을 프럼프트의 {context} 세팅한다
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+# 4-3. 최종 RAG 체인 구성 : 질문->검색->프럼프트 결합->LLM 질의->답변획득
+#      RunnablePassthrough 질문을 검색하면서 동시에 사용자 질문을 세팅함
+from langchain_core.runnables import RunnablePassthrough
+#      StrOutputParser llm의 응답을 파싱하여 문자열만 추출 
+from langchain_core.output_parsers import StrOutputParser
+rag_chain = (
+    {"context": retriever | format_docs, "user_input": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+# --- 8. 실행 ---
+query = "해리포터의 친구는?"
+print(f"질문: {query}\n")
+
+response = rag_chain.invoke(query)
+
+print("=== AI 답변 ===")
+print(response)

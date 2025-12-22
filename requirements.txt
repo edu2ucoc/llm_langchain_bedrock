@@ -8,3 +8,4 @@ langchain-core
 python-dotenv
 langchain-community
 faiss-cpu
+langchain
