@@ -57,11 +57,11 @@ retriever = db.as_retriever(search_kwargs={"k":3}) # 상위 3개 문서 참조
 # 4-2. 문서 결합 체인     : 검색된 문서들을 프럼프트의 {context} 세팅한다
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
-# 4-3. 최종 RAG 체인 구성 : 질문->검색->프럼프트 결합->LLM 질의->답변획득
 #      RunnablePassthrough 질문을 검색하면서 동시에 사용자 질문을 세팅함
 from langchain_core.runnables import RunnablePassthrough
-#      StrOutputParser llm의 응답을 파싱하여 문자열만 추출 
+#      StrOutputParserllm의 응답을 파싱하여 문자열만 추출 
 from langchain_core.output_parsers import StrOutputParser
+# 4-3. 최종 RAG 체인 구성 : 질문->검색->프럼프트 결합->LLM 질의->답변획득
 rag_chain = (
     {"context": retriever | format_docs, "user_input": RunnablePassthrough()}
     | prompt
