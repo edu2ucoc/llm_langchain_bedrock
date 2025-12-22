@@ -40,7 +40,7 @@ llm = ChatBedrockConverse(
 #        개발사의 의도대로 AI 방향성 설정
 fewshot_samples = [
     # input => human, output: => ai 매칭 가능함
-{
+    {
         "input": "오늘 점심 메뉴 추천해줘. 비가 오고 있어서 나가기 귀찮아. 혼자 먹을 거야.",
         "output": "비 오는 날, 집에서 편하게 즐길 수 있는 **'따뜻한 김치수제비와 해물파전'**을 추천합니다! 빗소리와 부침개 부치는 소리가 비슷해 감성을 자극하고, 칼칼한 국물은 가라앉은 기분을 전환해줄 거예요. 배달 앱을 이용하신다면 근처 칼국수 맛집의 세트 메뉴를 확인해보세요."
     },
@@ -57,6 +57,29 @@ fewshot_samples = [
         "output": "일주일 동안 정말 고생 많으셨어요! 스트레스를 한 방에 날려줄 **'마라탕과 꿔바로우 소(小)'**를 추천합니다. 원하는 재료를 듬뿍 넣어 아주 매운 단계로 즐겨보세요. 얼얼한 매운맛이 엔도르핀을 돌게 해줄 거예요. 시원한 캔맥주 하나 사서 집에서 넷플릭스를 보며 드시는 건 어떨까요?"
     }
 ]
+
+# 4-3-2. few-shot을 프럼프트 형태로 변환하여 템플릿 구성
+#        최초부터 프럼프트형태로 구성해도 OK, 준비한 데이터를 변환해도 OK
+fewshot_example_prompt = ChatPromptTemplate.from_messages([
+    ('human', '{input}'),
+    ('ai', '{ouptut}')
+])
+#print( fewshot_example_prompt )
+
+# 4-3-3. 퓨샷 프럼프트 + 퓨샷 샘플 => 샘플 제공되는 프럼프트 구성 완료
+fewshot_prompt = FewShotChatMessagePromptTemplate(
+    examples      =fewshot_samples,
+    example_prompt=fewshot_example_prompt
+)
+# 확장 : 퓨샷 샘플을 DB에 대량으로 준비하고 (주제별등등) -> 디비쿼리후 획득->퓨샷구성
+
+# 4-3-4. 최종 프럼프트 구성
+#        페르소나 + 퓨샷 + 고객 질문
+last_prompt = ChatPromptTemplate.from_messages([
+    ('system','당신은 직장인들의 식사 메뉴 고민을 해결해 주는 계획적인 "식사 해결사" 입니다. 상황에 맞게 계획적으로 메뉴를 추천해 주세요.'), # 페르소나
+    fewshot_prompt, # 샘플
+    ('human') # 실제 사용자의 질의 세팅
+])
 
 
 # 5. pydantic => 요청 혹은 응답의 구조를 정의한 클레스 설계
