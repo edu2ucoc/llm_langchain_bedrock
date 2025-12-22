@@ -62,7 +62,7 @@ fewshot_samples = [
 #        최초부터 프럼프트형태로 구성해도 OK, 준비한 데이터를 변환해도 OK
 fewshot_example_prompt = ChatPromptTemplate.from_messages([
     ('human', '{input}'),
-    ('ai', '{ouptut}')
+    ('ai', '{output}')
 ])
 #print( fewshot_example_prompt )
 
@@ -95,9 +95,13 @@ class UserRequest(BaseModel): # 4-1. BaseModel 클레스를 반드시 상속
 
 # 6. API 엔드포인트 구성
 @app.post('/chat')
-def llm_endpoint( req:UserRequest):# req => 매개변수 :UserRequest => 타입힌트
+async def llm_endpoint( req:UserRequest):# req => 매개변수 :UserRequest => 타입힌트
     #return {"response":f"에코 응답:{ req.question }"}
     # 5-1. `LLM 호출`하여 유저의 질의(프럼프트)를 전달 -> 결과를 받아서 -> 응답
     #      langchain 호출
-    response = chain.invoke({"user_cur_input":req.question})
-    return {"response":response.content}
+    try:
+        response = chain.invoke({"user_cur_input":req.question})
+        print( response.content )
+        return {"response":response.content}
+    except Exception as e:
+        return {"response":f"오류발생 {str(e)}"}
