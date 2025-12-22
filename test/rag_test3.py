@@ -71,10 +71,10 @@ rag_chain = (
 )
 
 # --- 8. 실행 ---
-query = "해리포터의 친구는?"
+query = "해리포터의 적은?"
 print(f"질문: {query}\n")
 
 response = rag_chain.invoke(query)
 
-print("=== AI 답변 ===")
+print("=== AI 답변 ===" )
 print(response)
