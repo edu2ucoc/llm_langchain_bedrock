@@ -55,11 +55,17 @@ if prompt := st.chat_input('현재 상황을 자세히 입력하세요...') :
         msg_holder.markdown('고민 중.... ㅡ,.ㅡ^')
 
         # 3-1. 서버측 사용자의 질의 전송
-        #res = req.post(API_URL, json={"question":prompt})
-        # 추후, 백엔드 구성후 교체
-        import time
-        time.sleep(2) # 서버 통신 시간을 시뮬레이션
-        res = "더미 응답 : 치킨으로 가보세요!!"
+        res = None
+        try:
+            res = req.post(API_URL, json={"question":prompt})
+            # 추후, 백엔드 구성후 교체
+            #import time
+            #time.sleep(2) # 서버 통신 시간을 시뮬레이션
+            #res = "더미 응답 : 치킨으로 가보세요!!"
+        except Exception as e:
+            # 더미 구성
+            print( e )
+            res = "사용자가 너무 많습니다 10초후에 다시 시도해 주세요"
         # 3-2. 화면처리
         msg_holder.markdown( res )
         # 3-3. 전역 상태 관리 변수에 추가

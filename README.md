@@ -72,3 +72,29 @@ L server.py         : 백엔드 담당, fastapi 주로 사용
         ```
             streamlit run app.py
         ```
+
+# 환경변수
+    - .env
+    - 리전, 모델 ID 추가
+        - 모델 ID : 
+            - 앤트로픽사의 클로드는 단시간 연속 질의에 쿼터 제한있는듯함.(이슈)
+            - 구글 혹은 오픈AI 제품으로 진행
+        ```
+            AWS_REGION=ap-northeast-1
+            BEDROCK_MODEL_ID=google.gemma-3-27b-it
+            AWS_BEARER_TOKEN_BEDROCK=...
+        ```
+
+# server.py
+    ```
+        백엔드 코드
+        - fastapi로 기본 코드 구성
+        - url 1개만 정의 "/llm"
+            - http://localhost:8000/llm
+            - post 방식
+            - json 데이터가 전달 -> pydantic  사용 (클레스로 요청객체 1개 구성)
+            - 함수 내부에서 bedrock 호출 -> llm 호출 -> 응답 -> {'response':응답값}
+
+        - 나머지는 랭체인 퓨샷등 프럼프트 구성 사용 (코랩 사용 코드 활용)
+        - model은 claude 사용 (다른 모델도 가능)
+    ```
