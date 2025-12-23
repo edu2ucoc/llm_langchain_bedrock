@@ -15,6 +15,10 @@
             - 프럼프트 + llm 호출 체인 연결 파이프라인 구축
     - 서비스 주제
         - 점심/저녁등 메뉴 해결사 (메뉴 추천)
+    - model_id
+        - google : google.gemma-3-27b-it
+        - openai : openai.gpt-oss-120b-1:0
+        - Anthropic : anthropic.claude-3-5-sonnet-20240620-v1:0
 
 # 구조
 /
