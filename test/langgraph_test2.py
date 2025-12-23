@@ -67,6 +67,9 @@ if __name__ == '__main__':
         # 3. 프럼프트 구성 (단순하게)
         prompt = {"messages":[HumanMessage(content=user_input)]} # 상태와 동일행태로 구성
         # 4. 그래프 작동(invoke:동기식, stream:비동기식,실시간중계,스트리밍 )
+        #    휘발성으로 이전 대화 내용이 모두 초기화됨 -> 최초 프럼프트 형태로 구성됨
+        #    그래프상에서 계속 움직이면서 대화하는 것은 기억하지만(히스토리가 있음)->신규질문하면 초기화됨
+        #    단기기억 필요함!!
         for evt in app.stream( prompt, stream_mode='values'):
             msg = evt['messages'][-1] # 가장 최근에 추가된 내용 -> 실시간 응답
         # 5. 출력 (실시간 출력 x, 마지막값 한번에 출력)
