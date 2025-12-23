@@ -49,15 +49,34 @@ final_prompt = ChatPromptTemplate.from_messages([
 ])
 
 
-# 랭그래프 상태 (커스텀)
+# 5. 랭그래프 상태 (커스텀)
 class AgentState(TypedDict):
     messages: List[BaseMessage]
 
-# 노드 정의
+# 6. 노드 정의
+# 6-1. 사용자의 질의(말)을 듣고 생각하는 단계 구성 (메뉴 추천 + 도구 사용 결정)
+def thinking_node(state:AgentState):
+    return {"messages":[ ]}
+# 6-2. LLM이 도구 사용을 결정했다면 - 실제로 도구 사용 - 간단한 MCP개념 - RAG 호출
+def tool_node(state:AgentState):
+    return {"messages":[ ]}
+# 6-3. 검색의 결과를 바탕으로 최종 답변(추론) 생성
+def final_answer_node(state:AgentState):
+    return {"messages":[ ]}
 
-# 랭그래프 연결
+# 7. 랭그래프 연결
 workflow = StateGraph(AgentState) # 에이전트 상태 그래프 연동
+workflow.add_node("thinking",       thinking_node)
+workflow.add_node("tools",           tool_node)
+workflow.add_node("final_answer",   final_answer_node)
+workflow.set_entry_point("thinking") # 사용자 질의후 최초 invoke이 진입할 노드
 
-# 랭그래프 컴파일 -> 워크 플로우 객체
+def check_tool_node(state:AgentState): # 도구 사용 여부 체크
+    pass
+workflow.add_conditional_edges("thinking", check_tool_node) # 조건부에지
+workflow.add_edge("tools","final_answer")
+workflow.add_edge("final_answer",END)  # 추론과정 마무리
+
+# 8. 랭그래프 컴파일 -> 워크 플로우 객체
 # 랭그래프객체 => 전역변수
 랭그래프객체 = workflow.compile()
