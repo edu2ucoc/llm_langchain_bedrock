@@ -26,9 +26,12 @@ llm_with_tools = llm.bind_tools(tools) # llm에게 이런 툴을 사용할수 �
 
 # 노드 신규 구성
 def chatbot_node(state:MessagesState):
+    print( 'chatbot_node pre   => ', state )
     # 계속된 대화 내용이 `누적`되어서 LLM에게 전달 하여 추론행위가 진행됨
     # 누적 => 히스토리 => 대화 내용을 계속해서 LLM에게 전달하여 대화가 이어지게됨
-    return {"messages":[llm_with_tools.invoke(state['messages'])] }
+    state2 = {"messages":[llm_with_tools.invoke(state['messages'])] }
+    print( 'chatbot_node after => ', state2 )
+    return state2
 
 # 그래프 구성상 상태 -> MessagesState 상태값의 맴버는 "messages"
 # 그래프 생성
