@@ -56,10 +56,18 @@ class AgentState(TypedDict):
 # 6. 노드 정의
 # 6-1. 사용자의 질의(말)을 듣고 생각하는 단계 구성 (메뉴 추천 + 도구 사용 결정)
 def thinking_node(state:AgentState):
-    return {"messages":[ ]}
+    # 6-1-1. 현재 상태의 프럼프트 실제 내용 획득 (페르소나+퓨샷+사용자질의)
+    messages = state['messages']
+    # 6-1-2. 랭체인구성 ( prompt + llm ) => 랭그래프의 특정 노드에 랭체인결합되어 있는 구조
+    chain    = final_prompt | llm_with_tools
+    # 6-1-3. LLM 질의 요청
+    res      = chain.invoke( {"messages":messages} )
+    return {"messages":[ res ]}
+
 # 6-2. LLM이 도구 사용을 결정했다면 - 실제로 도구 사용 - 간단한 MCP개념 - RAG 호출
 def tool_node(state:AgentState):
     return {"messages":[ ]}
+
 # 6-3. 검색의 결과를 바탕으로 최종 답변(추론) 생성
 def final_answer_node(state:AgentState):
     return {"messages":[ ]}
