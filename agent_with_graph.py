@@ -66,12 +66,28 @@ def thinking_node(state:AgentState):
 
 # 6-2. LLM이 도구 사용을 결정했다면 - 실제로 도구 사용 - 간단한 MCP개념 - RAG 호출
 def tool_node(state:AgentState):
-
-    return {"messages":[ ]}
+    # 툴사용 -> rag 이용한 검색증강
+    last_msg = state['messages'][-1]
+    # 툴사용 체크
+    print('last_msg.tool_calls', last_msg.tool_calls)
+    if last_msg.tool_calls: # 없으면 []
+        tool = last_msg.tool_calls[0] # 등록된 도구가 1개 => 인덱스 번호 0번
+        # 검색 증강 (백터디비 검색->유사도 1개획득(가게데이터)=>응답)
+        # 사내 데이터 검색, 판례 검색, 
+        tool_output = rag_search.invoke( tool['args'] ) 
+        # 해결 결과를 프럼프트에 추가
+    return {"messages":[ 
+        HumanMessage(content=f'[사내데이터 검색결과]: {tool_output}\n 제공된 정보를 기반으로 최종 답변을 해주세요.')
+    ]}
 
 # 6-3. 검색의 결과를 바탕으로 최종 답변(추론) 생성
 def final_answer_node(state:AgentState):
-    return {"messages":[ ]}
+    # 최종 프럼프트 획득(기존 주고 받은 내용 + 검생증강 내용)
+    final_msg = state['messages']
+    print('final_msg', final_msg)
+    # LLM 질의 -> TOOL 필요 없음
+    res = llm.invoke( final_msg )
+    return {"messages":[ res ]}
 
 # 7. 랭그래프 연결
 workflow = StateGraph(AgentState) # 에이전트 상태 그래프 연동
