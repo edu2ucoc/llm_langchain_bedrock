@@ -14,7 +14,7 @@ tokenizer = BedrockEmbeddings(client   = boto3.client(service_name='bedrock-runt
                                                       region_name=os.getenv('AWS_REGION')),
                               model_id = 'amazon.titan-embed-text-v1' )
 
-# 2. 더미 음싟점 데이터 (차후, 실데이터로 교체)
+# 2. 더미 음식점 데이터 (차후, 실데이터로 교체)
 data = [
     "가게명: 스파이시 웍, 메뉴: 마라탕, 꿔바로우, 특징: 아주 매움, 스트레스 풀림, 가격: 15000원",
     "가게명: 헬시 샐러드, 메뉴: 닭가슴살 샐러드, 샌드위치, 특징: 다이어트, 가벼움, 신선함, 가격: 9000원",
@@ -22,3 +22,11 @@ data = [
     "가게명: 골든 스시, 메뉴: 초밥 세트, 우동, 특징: 고급스러움, 깔끔함, 월급날 추천, 가격: 25000원",
     "가게명: 해장국 천국, 메뉴: 뼈해장국, 순대국, 특징: 국물 진함, 비 오는 날 추천, 가격: 10000원"
 ]
+
+# 3. 데이터 -> 백터화 -> FAISS에 저장
+vector_db = FAISS.from_texts( data, embedding=tokenizer )
+
+# 4. 함수 : 질의 -> 검색 -> 유사도순으로 후보 k개(한개의 문장으로 구성) 반환
+def search_stores(query : str, k : int = 2):
+    docs = vector_db.similarity_search(query, k)
+    return "\n".join( docs )
