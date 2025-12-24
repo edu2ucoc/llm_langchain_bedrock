@@ -4,19 +4,25 @@ pip install mcp
 TODO역활 MCP Host
 - AI 모델(LLM)과 MCP 클라이언트를 연결하는 주체 애플리케이션
 - LLM의 "뇌"를 사용하여 어떤 도구를 쓸지 결정하고, 실제 실행을 지시
-- 파이썬 파일 전체가 Host
+- 파이썬 파일 전체가 Host - mcp_test2.py (해당 프로그램 자체)
 - AWS Bedrock(Claude)에게 질문을 던지고, 답변을 받아 MCP Client에게 전달하는 "중개자" 역할
 
 MCP Client (클라이언트)
 - Host 내부에서 MCP Server와 실제로 통신하는 모듈
 - ClientSession 객체
-- "이 도구 실행해줘"라는 Host의 명령을 Server가 알아들을 수 있는 언어로 변환하여 전달
+- "이 도구 실행해줘"라는 Host의 명령을 Server가 알아들을 수 있는 언어로 `변환하여 전달`
 
 MCP Server (서버)
-- 실제 데이터(파일, DB 등)에 접근할 수 있는 권한을 가진 독립된 프로세스
+- 실제 데이터(파일, DB 등)에 접근할 수 있는 권한을 가진 `독립된 프로세스`
 - 도구(Tool)의 실제 기능을 수행
 - npx ... server-filesystem 명령어로 실행되는 Node.js 프로세스
 - 실제 컴퓨터의 파일을 읽거나(read_file) 목록을 조회(list_directory)
+- 종류
+    - 공식(Official) MCP 서버 -> Model Context Protocol 공식 팀에서 개발, 유지보수
+    - 커뮤니티 MCP 서버 -> 개발자들이 필요에 의해 생성
+    - 기업 공식 서버 -> 벤더(DB, 노션, 슬랙, ...)
+- LLM + 기능 결합하여 하나의 도구를 생성 => MCP
+
 '''
 import asyncio
 import boto3
@@ -52,7 +58,7 @@ async def run_mcp_host():
     # ... (이전 설정 코드는 동일) ...
     command = "npx.cmd" # 맥 "npx"
     # 경로 설정 주의 (사용자 환경에 맞게)
-    docs_path = r"c:/Users/Dell5371/Desktop/projects/llm/llm_langchain_bedrock/test/data"
+    docs_path = r"c:\\Users\\Dell5371\\Desktop\\projects\\llm\\llm_langchain_bedrock\\test\\data"
     
     # TODO역활 MCP Server (서버) - 독립된 프로세스
     # MCP 서버(Node.js)를 실행할 명령어와 인자 설정
