@@ -1,4 +1,6 @@
 '''
+pip install mcp
+
 TODO역활 MCP Host
 - AI 모델(LLM)과 MCP 클라이언트를 연결하는 주체 애플리케이션
 - LLM의 "뇌"를 사용하여 어떤 도구를 쓸지 결정하고, 실제 실행을 지시
@@ -48,9 +50,9 @@ def convert_mcp_to_bedrock_format(tools_list):
 
 async def run_mcp_host():
     # ... (이전 설정 코드는 동일) ...
-    command = "npx.cmd" 
+    command = "npx.cmd" # 맥 "npx"
     # 경로 설정 주의 (사용자 환경에 맞게)
-    docs_path = r"C:/Users/Dell5371/Downloads/앱-20251222T000521Z-3-001/앱/docs"
+    docs_path = r"c:/Users/Dell5371/Desktop/projects/llm/llm_langchain_bedrock/test/data"
     
     # TODO역활 MCP Server (서버) - 독립된 프로세스
     # MCP 서버(Node.js)를 실행할 명령어와 인자 설정
