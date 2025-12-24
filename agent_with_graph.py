@@ -109,6 +109,8 @@ workflow.add_node("tools",           tool_node)
 workflow.add_node("final_answer",   final_answer_node)
 workflow.set_entry_point("thinking") # 사용자 질의후 최초 invoke이 진입할 노드
 
+# 핵심: 에이전트가 상태값을 유지하면서 LLM에서 호출로 마무리 할지? 도구 사용후 마무리 할지 판단(LLM 맡김)
+#      에이전트의 역활 점심/저녁등 식사 메뉴를 추천하는 기능 제공(도우미)
 def check_tool_node(state:AgentState): # 도구 사용 여부 체크 (초대형 LLM은 도구 사용 필요 거의 x)
     # LLM의 마지막 응답결과 추출 - 대화 내용중 마지막 내용은 LLM이 대답한 것임
     last_msg = state['messages'][-1]
