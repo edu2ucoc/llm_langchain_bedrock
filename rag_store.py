@@ -31,4 +31,5 @@ vector_db = FAISS.from_texts( data, embedding=tokenizer )
 # 4. 함수 : 질의 -> 검색 -> 유사도순으로 후보 k개(한개의 문장으로 구성) 반환
 def search_stores(query : str, k : int = 2):
     docs = vector_db.similarity_search(query, k)
-    return "\n".join( docs )
+    print( "검색결과 : ", docs)
+    return "\n".join( [ doc.page_content  for doc in docs] )

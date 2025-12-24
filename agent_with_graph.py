@@ -66,6 +66,7 @@ def thinking_node(state:AgentState):
 
 # 6-2. LLM이 도구 사용을 결정했다면 - 실제로 도구 사용 - 간단한 MCP개념 - RAG 호출
 def tool_node(state:AgentState):
+    print('tool_node 호출')
     # 툴사용 -> rag 이용한 검색증강
     last_msg = state['messages'][-1]
     # 툴사용 체크
@@ -74,11 +75,23 @@ def tool_node(state:AgentState):
         tool = last_msg.tool_calls[0] # 등록된 도구가 1개 => 인덱스 번호 0번
         # 검색 증강 (백터디비 검색->유사도 1개획득(가게데이터)=>응답)
         # 사내 데이터 검색, 판례 검색, 
+        '''
+            last_msg.tool_calls [
+                {
+                    'name': 'rag_search', 
+                    'args': {'cate': '가벼운 식사'}, 
+                    'id': 'tooluse_HPRr7vMBQc2e5nG332Gfig',
+                    'type': 'tool_call'
+                }
+            ]
+        '''
         tool_output = rag_search.invoke( tool['args'] ) 
         # 해결 결과를 프럼프트에 추가
-    return {"messages":[ 
-        HumanMessage(content=f'[사내데이터 검색결과]: {tool_output}\n 제공된 정보를 기반으로 최종 답변을 해주세요.')
-    ]}
+        print( tool_output )
+        return {"messages":[ 
+            HumanMessage(content=f'[사내데이터 검색결과]: {tool_output}\n 제공된 정보를 기반으로 최종 답변을 해주세요.')
+        ]}
+    return {"messages":[]}
 
 # 6-3. 검색의 결과를 바탕으로 최종 답변(추론) 생성
 def final_answer_node(state:AgentState):
@@ -104,6 +117,7 @@ def check_tool_node(state:AgentState): # 도구 사용 여부 체크 (초대형 
     # 대답의 내용 구조중 툴에 대한 언급, 표현등이 있는지 체크 -> 
     # llm.bind_tools(tools) 사용으로 인해서 생기는 표현   -> 특정표식을 하게됨
     if last_msg.tool_calls: # 문자열로 툴에 대한 값이 세팅됨
+        print('툴사용 -> 툴노드로 이동')
         return "tools"      # 커스텀 지정값(노드의 이름 지정) -> 툴노드로 가라는 의미
     return END # LLM의 답변으로 충분하다. 도구 사용 x, 대화를 마무리한다
 
