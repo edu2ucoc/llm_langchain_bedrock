@@ -7,7 +7,9 @@
 from langchain_community.vectorstores import FAISS
 from langchain_aws import BedrockEmbeddings
 import boto3
+from dotenv import load_dotenv
 import os
+load_dotenv()
 
 # 1. BedrockEmbeddings 객체 생성
 tokenizer = BedrockEmbeddings(client   = boto3.client(service_name='bedrock-runtime',

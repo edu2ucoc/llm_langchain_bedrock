@@ -66,6 +66,7 @@ def thinking_node(state:AgentState):
 
 # 6-2. LLM이 도구 사용을 결정했다면 - 실제로 도구 사용 - 간단한 MCP개념 - RAG 호출
 def tool_node(state:AgentState):
+
     return {"messages":[ ]}
 
 # 6-3. 검색의 결과를 바탕으로 최종 답변(추론) 생성
@@ -79,9 +80,18 @@ workflow.add_node("tools",           tool_node)
 workflow.add_node("final_answer",   final_answer_node)
 workflow.set_entry_point("thinking") # 사용자 질의후 최초 invoke이 진입할 노드
 
-def check_tool_node(state:AgentState): # 도구 사용 여부 체크
-    pass
-workflow.add_conditional_edges("thinking", check_tool_node) # 조건부에지
+def check_tool_node(state:AgentState): # 도구 사용 여부 체크 (초대형 LLM은 도구 사용 필요 거의 x)
+    # LLM의 마지막 응답결과 추출 - 대화 내용중 마지막 내용은 LLM이 대답한 것임
+    last_msg = state['messages'][-1]
+    print( "1차 노드 수행후 LLM의 응답값 : ", last_msg)
+    print( "1차 노드 수행후 도구 사용 여부 : ", last_msg.tool_calls)
+    # 대답의 내용 구조중 툴에 대한 언급, 표현등이 있는지 체크 -> 
+    # llm.bind_tools(tools) 사용으로 인해서 생기는 표현   -> 특정표식을 하게됨
+    if last_msg.tool_calls: # 문자열로 툴에 대한 값이 세팅됨
+        return "tools"      # 커스텀 지정값(노드의 이름 지정) -> 툴노드로 가라는 의미
+    return END # LLM의 답변으로 충분하다. 도구 사용 x, 대화를 마무리한다
+
+workflow.add_conditional_edges("thinking", check_tool_node) # 조건부 엣
 workflow.add_edge("tools","final_answer")
 workflow.add_edge("final_answer",END)  # 추론과정 마무리
 
